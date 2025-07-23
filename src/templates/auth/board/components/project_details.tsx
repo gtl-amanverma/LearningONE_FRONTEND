@@ -1,10 +1,7 @@
 import { useAuth } from "@/context/auth_context";
-import { TProjectDetailsType } from "@/types/board_type";
+import { TProjectDetailsType, TTaskType } from "@/types/board_type";
 import {
-  IconEdit,
   IconLoader,
-  IconPlus,
-  IconTicket,
 } from "@tabler/icons-react";
 import React, { useCallback, useEffect, useState } from "react";
 import ProjectUserButton from "./project_details/project_users_button";
@@ -13,6 +10,7 @@ import SelectUsers from "./select_user";
 import SelectSprint from "./project_details/sprint_select";
 import { TSprintType } from "@/mocks/board_data_with_type";
 import CustomAccordion from "@/components/accordion/component";
+import BoardCard from "./project_details/boardCard";
 
 type props = {
   projectId: string;
@@ -28,6 +26,9 @@ const ProjectDetails = ({ ...props }: props) => {
   const [selectedSprint, setSelectedSprint] = useState<TSprintType | null>(
     null
   );
+  const [hoveredTask, setHoveredTask] = useState<TTaskType | null>(null);
+
+  console.log("hoveredTask", hoveredTask);
 
   const handleFetchProjectDetails = useCallback(async () => {
     try {
@@ -58,10 +59,8 @@ const ProjectDetails = ({ ...props }: props) => {
     handleFetchProjectDetails();
   }, [handleFetchProjectDetails, isRefresh]);
 
-  console.log("projectDetails", projectDetails);
-
   return (
-    <div className="w-full">
+    <div className="w-full text-white">
       {isApiLoading ? (
         <div className="w-full h-[calc(100vh-165px)] flex items-center justify-center">
           <IconLoader className="animate-spin" />
@@ -122,54 +121,7 @@ const ProjectDetails = ({ ...props }: props) => {
                     <div className="mt-5 w-full flex flex-row items-center justify-between gap-2 overflow-x-auto scrollbar-hide">
                       {sprint.sprintBoardDetails.map((board, index) => {
                         return (
-                          <div
-                            key={index}
-                            className="w-[31rem] bg-gray-700 h-[50rem] flex-shrink-0 rounded-2xl"
-                          >
-                            <div className="w-full border-b rounded-t-2xl p-4 border-gray-600 flex items-center justify-between gap-2">
-                              <div className="flex items-center justify-center gap-2">
-                                <p className="text-xl text-gray-400">
-                                  {board.boardName}
-                                </p>
-                                <IconEdit className="text-gray-400 cursor-pointer" />
-                              </div>
-                              <div>
-                                {board.boardName === "TO DO" && (
-                                  <div className="bg-gray-600 p-1 rounded-sm cursor-pointer">
-                                    <IconPlus />
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="h-[calc(100vh-480px)] p-4">
-                              {board.boardTasks &&
-                              board.boardTasks.length > 0 ? (
-                                <div className="w-full h-full flex flex-col items-start justify-start gap-2 overflow-auto scrollbar-hide">
-                                  {board.boardTasks.map((task, index) => {
-                                    return (
-                                      <div
-                                        key={index}
-                                        className="w-full bg-gray-600 min-h-12 rounded-2xl flex-shrink-0 p-4"
-                                      >
-                                        <div className="w-full flex items-center justify-start gap-2">
-                                          <IconTicket />
-                                          <p>{123456}</p>
-                                        </div>
-                                        <div className="w-full flex items-center justify-start gap-2">
-                                          <p>{task.taskName}</p>
-                                        </div>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-gray-500 text-xl">
-                                  No Task
-                                </div>
-                              )}
-                            </div>
-                          </div>
+                          <div key={index}><BoardCard boardDetails={board} setTask={setHoveredTask} /></div>
                         );
                       })}
                     </div>
